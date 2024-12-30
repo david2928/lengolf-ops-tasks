@@ -12,6 +12,9 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
 
     steps:
     - uses: actions/checkout@v4
@@ -28,17 +31,18 @@ jobs:
     - name: Build
       run: npm run build
 
-    - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v2
+    - name: Google Auth
+      id: auth
+      uses: google-github-actions/auth@v2
       with:
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+        
     - name: Deploy to Cloud Run
       uses: google-github-actions/deploy-cloudrun@v2
       with:
         service: ${{ env.APP_NAME }}
         region: ${{ env.REGION }}
         source: ./dist
+        project_id: ${{ env.PROJECT_ID }}
         env_vars: |
           NODE_ENV=production
