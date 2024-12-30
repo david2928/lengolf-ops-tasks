@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.open-task {
+  @apply bg-blue-50 border border-blue-200;
+}
+
+.completed-task {
+  @apply bg-green-50 border border-green-200 line-through;
+}
