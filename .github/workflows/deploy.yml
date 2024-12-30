@@ -1,4 +1,4 @@
-name: Deploy to Google Cloud
+name: Deploy to Cloud Run
 
 on:
   push:
@@ -19,30 +19,23 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Build
-      run: npm run build
-
     - name: Google Auth
       id: auth
       uses: google-github-actions/auth@v2
       with:
         credentials_json: '${{ secrets.GCP_SA_KEY }}'
-        
+
+    - name: Configure Docker
+      run: gcloud auth configure-docker asia-southeast1-docker.pkg.dev
+
+    - name: Build and Push
+      run: |
+        docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/cloud-run-source-deploy/${{ env.APP_NAME }} .
+        docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/cloud-run-source-deploy/${{ env.APP_NAME }}
+
     - name: Deploy to Cloud Run
       uses: google-github-actions/deploy-cloudrun@v2
       with:
         service: ${{ env.APP_NAME }}
         region: ${{ env.REGION }}
-        source: ./dist
-        project_id: ${{ env.PROJECT_ID }}
-        env_vars: |
-          NODE_ENV=production
+        image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/cloud-run-source-deploy/${{ env.APP_NAME }}

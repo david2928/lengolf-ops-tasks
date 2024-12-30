@@ -1,7 +1,11 @@
-FROM node:18-alpine
+FROM node:20-slim
+
 WORKDIR /app
-COPY dist .
-ENV PORT=8080
+COPY package*.json ./
+RUN npm install
+COPY . ./
+RUN npm run build
+
 EXPOSE 8080
-RUN npm install -g serve
-CMD serve -s . -l $PORT
+ENV PORT=8080
+CMD [ "npm", "run", "serve" ]
