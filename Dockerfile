@@ -5,8 +5,13 @@ COPY package*.json ./
 RUN npm install
 COPY . ./
 RUN npm run build
-RUN npm install -g http-server
+
+# Debug - List files in dist
+RUN ls -la dist
+
+# Install serve
+RUN npm install -g serve
 
 EXPOSE 8080
 ENV PORT=8080
-CMD ["http-server", "dist", "-p", "8080"]
+CMD ["serve", "-s", "dist", "-l", "8080"]

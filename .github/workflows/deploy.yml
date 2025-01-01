@@ -39,3 +39,4 @@ jobs:
         service: ${{ env.APP_NAME }}
         region: ${{ env.REGION }}
         image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/cloud-run-source-deploy/${{ env.APP_NAME }}:latest
+        flags: --allow-unauthenticated
